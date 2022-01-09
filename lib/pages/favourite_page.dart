@@ -17,49 +17,33 @@ class FavouritesPage extends StatelessWidget {
       );
     }
 
-    return Container( 
-      child: ReorderableListView(
-        onReorder: (old_index, new_index) {
-          var favourite = prefs.favourites[old_index];
-          prefs.favourites.removeAt(old_index);
-          print("$old_index and $new_index");
+    return ReorderableListView(
+      onReorder: (old_index, new_index) {
+        var favourite = prefs.favourites[old_index];
+        prefs.favourites.removeAt(old_index);
+        print("$old_index and $new_index");
 
-          if(old_index > new_index){
-            print(" old less than new");
-            prefs.favourites.insert(new_index, favourite);
-            print(prefs.favourites.length);
-          }
+        if(old_index > new_index){
+          print(" old less than new");
+          prefs.favourites.insert(new_index, favourite);
+          print(prefs.favourites.length);
+        }
 
-          else if(new_index > prefs.favourites.length){
-            prefs.favourites.add(favourite);
-          }
-          else{
-            prefs.favourites.insert(new_index-1, favourite);
-          }
+        else if(new_index > prefs.favourites.length){
+          prefs.favourites.add(favourite);
+        }
+        else{
+          prefs.favourites.insert(new_index-1, favourite);
+        }
 
-          
-          prefs.saveFavourites();
-        },
-        padding: EdgeInsets.all(4),
-        children: [
-          for (var favourite in prefs.favourites) 
-            StopTile(stop: favourite, key: ValueKey(favourite),)
-        ],
-      ),
-      
-
-
-
-
-      // child: ListView.builder(
-      //   padding: EdgeInsets.all(4.0),
-      //   itemCount: prefs.favourites.length,
-      //   itemBuilder: (context, i) {
-      //     return StopTile(
-      //       stop: prefs.favourites[i],
-      //     );
-      //   },
-      // )
+        
+        prefs.saveFavourites();
+      },
+      padding: EdgeInsets.all(4),
+      children: [
+        for (var favourite in prefs.favourites) 
+          StopTile(stop: favourite, key: ValueKey(favourite),)
+      ],
     );
   }
 }
