@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:irish_bus_refresh/pages/favourite_page.dart';
 import 'package:irish_bus_refresh/pages/map_page.dart';
@@ -46,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 1;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    MapSample(),
     SearchPage(),
     FavouritesPage(),
   ];
@@ -61,11 +61,24 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark
+        ),
+        elevation: 0,
+        backgroundColor: Theme.of(context).canvasColor,
+        actions: [
+          IconButton(onPressed: (){
+            Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MapSample(
+                          )));
+          }, icon: const Icon(Icons.location_pin), color: Theme.of(context).colorScheme.primary,)
+        ],
+              ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.location_pin), label: 'Map'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(
               icon: Icon(Icons.star_border_outlined), label: 'favourites')

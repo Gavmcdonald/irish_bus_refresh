@@ -24,6 +24,7 @@ class _ResultPageState extends State<ResultPage> {
   @override
   initState(){
     getStopData(widget.stop.name);
+    print('${widget.stop.stopNumber}');
     super.initState();
   }
 
@@ -67,11 +68,21 @@ class _ResultPageState extends State<ResultPage> {
     int year = DateTime.now().year;
     int month = DateTime.now().month;
     int day = DateTime.now().day;
+
+    String monthString = month < 10 ? "0$month" : month.toString();
+
+    print(monthString);
     /////////THIS IS THE WORKING CODE FOR RETRIEVING RESULTS FROM SMARTDUBLIN
     try {
-      final response = await _client.get('https://journeyplanner.transportforireland.ie/nta/XML_DM_REQUEST?coordOutputFormat=WGS84%5Bdd.ddddd%5D&language=ie&std3_suggestMacro=std3_suggest&std3_commonMacro=dm&includeCompleteStopSeq=1&mergeDep=1&mode=direct&useAllStops=1&type_dm=any&nameInfo_dm=$stopId&itdDateDayMonthYear=$day.$month.$year&itdLPxx_snippet=1&itdLPxx_template=dmresults&outputFormat=rapidJSON');
+      final response = await _client.get('https://journeyplanner.transportforireland.ie/nta/XML_DM_REQUEST?coordOutputFormat=WGS84%5Bdd.ddddd%5D&language=ie&std3_suggestMacro=std3_suggest&std3_commonMacro=dm&includeCompleteStopSeq=1&mergeDep=1&mode=direct&useAllStops=1&type_dm=any&nameInfo_dm=$stopId&itdDateDayMonthYear=$day.$monthString.$year&itdLPxx_snippet=1&itdLPxx_template=dmresults&outputFormat=rapidJSON');
+      print('https://journeyplanner.transportforireland.ie/nta/XML_DM_REQUEST?coordOutputFormat=WGS84%5Bdd.ddddd%5D&language=ie&std3_suggestMacro=std3_suggest&std3_commonMacro=dm&includeCompleteStopSeq=1&mergeDep=1&mode=direct&useAllStops=1&type_dm=any&nameInfo_dm=$stopId&itdDateDayMonthYear=$day.$monthString.$year&itdLPxx_snippet=1&itdLPxx_template=dmresults&outputFormat=rapidJSON');
+      
       if (response.statusCode == 200) {
         var parsed = json.decode(response.body);
+
+        print("code 200");
+
+        print(parsed[''].runtimeType);
 
         if(parsed['stopEvents'] == null){
           setState(() {

@@ -81,6 +81,12 @@ class MapSampleState extends State<MapSample> {
     _determinePosition();
     print('number of filtered markers${_filteredMarkers.length}');
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text('Map Vew'),
+        centerTitle: true,
+
+      ),
       body: GoogleMap(
         minMaxZoomPreference: const MinMaxZoomPreference(13.0, 20.0),
         myLocationButtonEnabled: true,
