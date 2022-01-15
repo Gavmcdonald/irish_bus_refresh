@@ -1,4 +1,4 @@
-package com.example.irish_bus_refresh
+package eu.gavinmcdonald.buseireannrealtime
 
 import io.flutter.embedding.android.FlutterActivity
 
