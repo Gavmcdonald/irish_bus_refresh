@@ -28,7 +28,7 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   initState() {
-    getStopData(widget.stop.name);
+    getStopData(widget.stop.id);
     checkForInternet();
     super.initState();
   }
@@ -40,6 +40,7 @@ class _ResultPageState extends State<ResultPage> {
 
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           actions: [
             IconButton(
               padding: const EdgeInsets.all(0),
@@ -73,22 +74,26 @@ class _ResultPageState extends State<ResultPage> {
         child: Text('No buses due'),
       );
     } else {
-      return Stack(
-        children: [Padding(padding: const EdgeInsets.only(top: 8),child: Align(alignment: Alignment.topCenter,child: Text(statusMessage))),Center(
+      return Stack(children: [
+        Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Align(
+                alignment: Alignment.topCenter, child: Text(statusMessage))),
+        Center(
             child: _loading
                 ? const CircularProgressIndicator()
                 : RefreshIndicator(
-                  onRefresh: () => getStopData(widget.stop.name),
-                  child: ListView(
-                    padding: const EdgeInsets.only(top: 20),
+                    onRefresh: () => getStopData(widget.stop.name),
+                    child: ListView(
+                      padding: const EdgeInsets.only(top: 20),
                       children: _results,
                     ),
-                )),
-        ]);
+                  )),
+      ]);
     }
   }
 
-    checkForInternet() async {
+  checkForInternet() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       setState(() {
@@ -111,22 +116,21 @@ class _ResultPageState extends State<ResultPage> {
       _loading = true;
     });
 
+    DateTime now = DateTime.now();
 
-    int year = DateTime.now().year;
-    int month = DateTime.now().month;
-    int day = DateTime.now().day;
+    int year = now.year;
+    int month = now.month;
+    int day = now.day;
 
     String monthString = month < 10 ? "0$month" : month.toString();
     try {
       final response = await _client.get(
           'https://journeyplanner.transportforireland.ie/nta/XML_DM_REQUEST?coordOutputFormat=WGS84%5Bdd.ddddd%5D&language=ie&std3_suggestMacro=std3_suggest&std3_commonMacro=dm&includeCompleteStopSeq=1&mergeDep=1&mode=direct&useAllStops=1&type_dm=any&nameInfo_dm=$stopId&itdDateDayMonthYear=$day.$monthString.$year&itdLPxx_snippet=1&itdLPxx_template=dmresults&outputFormat=rapidJSON');
 
+      print(
+          'https://journeyplanner.transportforireland.ie/nta/XML_DM_REQUEST?coordOutputFormat=WGS84%5Bdd.ddddd%5D&language=ie&std3_suggestMacro=std3_suggest&std3_commonMacro=dm&includeCompleteStopSeq=1&mergeDep=1&mode=direct&useAllStops=1&type_dm=any&nameInfo_dm=$stopId&itdDateDayMonthYear=$day.$monthString.$year&itdLPxx_snippet=1&itdLPxx_template=dmresults&outputFormat=rapidJSON');
       if (response.statusCode == 200) {
         var parsed = json.decode(response.body);
-
-        print("code 200");
-
-        print(parsed[''].runtimeType);
 
         if (parsed['stopEvents'] == null) {
           setState(() {
@@ -136,31 +140,48 @@ class _ResultPageState extends State<ResultPage> {
         }
 
         for (var result in parsed['stopEvents']) {
+          int dueMins = DateTime.parse(result['departureTimePlanned'])
+              .difference(now)
+              .inMinutes;
           int min = DateTime.parse(result['departureTimePlanned']).minute;
           String minute = min < 10 ? '0$min' : '$min';
-          _results.add(ResultTile(
-              departureTime:
-                  '${DateTime.parse(result['departureTimePlanned']).hour}:$minute',
-              destination: result['transportation']['destination']['name'],
-              route: result['transportation']['disassembledName']));
+
+          if (result["isRealtimeControlled"] != null) {
+            if (dueMins <= 1) {
+              _results.add(ResultTile(
+                  departureTime: 'now',
+                  destination: result['transportation']['destination']['name'],
+                  route: result['transportation']['disassembledName']));
+            } else if (dueMins <= 60) {
+              _results.add(ResultTile(
+                  departureTime: '$dueMins mins',
+                  destination: result['transportation']['destination']['name'],
+                  route: result['transportation']['disassembledName']));
+            } else {
+              _results.add(ResultTile(
+                  departureTime:
+                      '${DateTime.parse(result['departureTimePlanned']).hour}:$minute',
+                  destination: result['transportation']['destination']['name'],
+                  route: result['transportation']['disassembledName']));
+            }
+          }
         }
 
         lastSynced = DateTime.now();
 
         setState(() {
-
           if (lastSynced != null) {
-      String hour = lastSynced.hour > 9
-          ? lastSynced.hour.toString()
-          : '0${lastSynced.hour}';
-      String minute = lastSynced.minute > 9
-          ? lastSynced.minute.toString()
-          : '0${lastSynced.minute}';
+            String hour = lastSynced.hour > 9
+                ? lastSynced.hour.toString()
+                : '0${lastSynced.hour}';
+            String minute = lastSynced.minute > 9
+                ? lastSynced.minute.toString()
+                : '0${lastSynced.minute}';
 
-      statusMessage = "Last synced $hour:$minute";
-    } else if (lastSynced == null) {
-      statusMessage = "";
-    }
+            statusMessage = "Last synced $hour:$minute";
+          } else if (lastSynced == null) {
+            statusMessage = "";
+          }
           _results = _results;
           _loading = false;
         });
@@ -183,11 +204,6 @@ class _ResultPageState extends State<ResultPage> {
       // notifyListeners();
     }
 
-
-      minutesSincelastSync() {
-    
-  }
-
-
+    minutesSincelastSync() {}
   }
 }
