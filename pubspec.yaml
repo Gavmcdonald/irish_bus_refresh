@@ -67,6 +67,8 @@ dependencies:
   google_mobile_ads: ^1.0.1
   package_info: ^2.0.2
   flutter_markdown: ^0.6.9
+  firebase_core: ^1.11.0
+  firebase_analytics: ^9.0.5
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

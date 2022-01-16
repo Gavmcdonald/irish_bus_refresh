@@ -9,10 +9,16 @@ import 'package:irish_bus_refresh/pages/search_page.dart';
 import 'package:irish_bus_refresh/pages/settings_page.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   if (defaultTargetPlatform == TargetPlatform.android) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
@@ -23,10 +29,15 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
 
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorObservers: <NavigatorObserver>[observer],
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -78,7 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Theme.of(context).colorScheme.primary,
           ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.adaptive.more,color: Theme.of(context).primaryColor,),
+            icon: Icon(
+              Icons.adaptive.more,
+              color: Theme.of(context).primaryColor,
+            ),
             onSelected: optionSelection,
             itemBuilder: (BuildContext context) {
               List<String> options = ["Settings"];
