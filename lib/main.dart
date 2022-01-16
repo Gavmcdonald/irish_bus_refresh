@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:irish_bus_refresh/pages/favourite_page.dart';
 import 'package:irish_bus_refresh/pages/map_page.dart';
 import 'package:irish_bus_refresh/pages/search_page.dart';
+import 'package:irish_bus_refresh/pages/settings_page.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
 import 'package:provider/provider.dart';
 
@@ -13,13 +14,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
 
-
   if (defaultTargetPlatform == TargetPlatform.android) {
-  AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
-}
-  runApp(ChangeNotifierProvider.value(
-    value: Prefs(),
-    child: const MyApp()));
+    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+  }
+  runApp(ChangeNotifierProvider.value(value: Prefs(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -66,21 +64,34 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark
-        ),
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark),
         elevation: 0,
         backgroundColor: Theme.of(context).canvasColor,
         actions: [
-          IconButton(onPressed: (){
-            Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MapSample(
-                          )));
-          }, icon: const Icon(Icons.location_pin), color: Theme.of(context).colorScheme.primary,)
+          IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MapSample()));
+            },
+            icon: const Icon(Icons.location_pin),
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.adaptive.more,color: Theme.of(context).primaryColor,),
+            onSelected: optionSelection,
+            itemBuilder: (BuildContext context) {
+              List<String> options = ["Settings"];
+              return options.map((String option) {
+                return PopupMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList();
+            },
+          )
         ],
-              ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
@@ -94,5 +105,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
     );
+  }
+
+  void optionSelection(String selection) {
+    if (selection == "Settings") {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const SettingsPage()));
+    }
   }
 }

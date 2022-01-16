@@ -11,6 +11,7 @@ import 'package:irish_bus_refresh/widgets/result_tile.dart';
 import 'package:provider/provider.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key key, @required this.stop}) : super(key: key);
@@ -27,6 +28,7 @@ class _ResultPageState extends State<ResultPage> {
   List<Widget> _results = [];
   final _client = http.Client();
   bool hasConnection = true;
+  bool showScheduledDepartures = false;
 
   BannerAd _anchoredAdaptiveAd;
   bool _isLoaded = false;
@@ -35,6 +37,14 @@ class _ResultPageState extends State<ResultPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadAd();
+  }
+
+  getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      showScheduledDepartures =
+          (prefs.getBool('showScheduledDepartures') ?? false);
+    });
   }
 
   Future<void> _loadAd() async {
@@ -92,6 +102,7 @@ class _ResultPageState extends State<ResultPage> {
   initState() {
     getStopData(widget.stop.id);
     checkForInternet();
+    getSharedPrefs();
     super.initState();
   }
 
@@ -246,6 +257,13 @@ class _ResultPageState extends State<ResultPage> {
                   destination: result['transportation']['destination']['name'],
                   route: result['transportation']['disassembledName']));
             }
+          } else if (result["isRealtimeControlled"] == null &&
+              showScheduledDepartures) {
+            _results.add(ResultTile(
+                departureTime:
+                    '${DateTime.parse(result['departureTimePlanned']).hour}:$minute',
+                destination: result['transportation']['destination']['name'],
+                route: result['transportation']['disassembledName']));
           }
         }
 
