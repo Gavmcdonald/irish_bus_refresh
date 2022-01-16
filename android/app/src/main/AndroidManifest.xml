@@ -14,6 +14,10 @@
         
         <meta-data android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyBpKQd3LXGIxWRlzOM5jcXzkp2Zmia8R7I"/>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2091957797827628~1999722121"/>
         
 
         <activity

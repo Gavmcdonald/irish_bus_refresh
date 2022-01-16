@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -25,6 +27,66 @@ class _ResultPageState extends State<ResultPage> {
   List<Widget> _results = [];
   final _client = http.Client();
   bool hasConnection = true;
+
+  BannerAd _anchoredAdaptiveAd;
+  bool _isLoaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadAd();
+  }
+
+  Future<void> _loadAd() async {
+    await _anchoredAdaptiveAd?.dispose();
+    setState(() {
+      _anchoredAdaptiveAd = null;
+      _isLoaded = false;
+    });
+
+    final AnchoredAdaptiveBannerAdSize size =
+        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+            MediaQuery.of(context).size.width.truncate());
+
+    if (size == null) {
+      print('Unable to get height of anchored banner.');
+      return;
+    }
+
+    _anchoredAdaptiveAd = BannerAd(
+      adUnitId: Platform.isAndroid
+          ? 'ca-app-pub-2091957797827628/7306344533'
+          : 'ca-app-pub-2091957797827628/1127531104',
+      size: size,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          setState(() {
+            _anchoredAdaptiveAd = ad as BannerAd;
+            _isLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          print('Anchored adaptive banner failedToLoad: $error');
+          ad.dispose();
+        },
+      ),
+    );
+    return _anchoredAdaptiveAd.load();
+  }
+
+  Widget _getAdWidget() {
+    print('getting ad widget');
+    if (_anchoredAdaptiveAd != null && _isLoaded) {
+      return Container(
+        color: Theme.of(context).backgroundColor,
+        width: _anchoredAdaptiveAd.size.width.toDouble(),
+        height: _anchoredAdaptiveAd.size.height.toDouble(),
+        child: AdWidget(ad: _anchoredAdaptiveAd),
+      );
+    }
+    return Container();
+  }
 
   @override
   initState() {
@@ -65,13 +127,29 @@ class _ResultPageState extends State<ResultPage> {
 
   buildBody() {
     if (!hasConnection) {
-      return const Center(
-        child: Text('No Internet Connection'),
+      return Stack(
+        children: [
+          const Center(
+            child: Text('No Internet Connection'),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _getAdWidget(),
+          )
+        ],
       );
     }
     if (_results.isEmpty & !_loading) {
-      return const Center(
-        child: Text('No buses due'),
+      return Stack(
+        children: [
+          const Center(
+            child: Text('No buses due'),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: _getAdWidget(),
+          )
+        ],
       );
     } else {
       return Stack(children: [
@@ -85,10 +163,14 @@ class _ResultPageState extends State<ResultPage> {
                 : RefreshIndicator(
                     onRefresh: () => getStopData(widget.stop.name),
                     child: ListView(
-                      padding: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 300),
                       children: _results,
                     ),
                   )),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: _getAdWidget(),
+        )
       ]);
     }
   }
@@ -205,5 +287,11 @@ class _ResultPageState extends State<ResultPage> {
     }
 
     minutesSincelastSync() {}
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _anchoredAdaptiveAd?.dispose();
   }
 }
