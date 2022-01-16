@@ -23,6 +23,7 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  final controller = TextEditingController();
   String statusMessage = "";
   DateTime lastSynced;
   List<Widget> _results = [];
@@ -110,9 +111,63 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     Prefs prefs = Provider.of<Prefs>(context);
+    void optionSelection(String selection) {
+      if (selection == "Rename") {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                elevation: 10,
+                title: Text(
+                  "Rename Stop",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Theme.of(context).accentColor),
+                ),
+                content: TextField(
+                  autofocus: true,
+                  controller: controller,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4)),
+                      hintText: widget.stop.name.split(", ")[0]),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("Close"),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  TextButton(
+                    child: Text("Save",
+                        style: TextStyle(color: Theme.of(context).accentColor)),
+                    onPressed: () {
+                      controller.value.text == ""
+                          ? widget.stop.customName = ""
+                          : widget.stop.customName = controller.value.text;
+                      prefs.updateCustomName(widget.stop);
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+      }
+
+      if (selection == "Clear Custom Name") {
+        widget.stop.customName = "";
+        prefs.updateCustomName(widget.stop);
+      }
+    }
+
+    bool showMenu = false;
+    if (prefs.favourites.contains(widget.stop)) {
+      showMenu = true;
+    }
 
     return Scaffold(
         appBar: AppBar(
+          title: widget.stop.hasCustomName
+              ? Text(widget.stop.customName)
+              : Text(widget.stop.name.split(', ')[0]),
           centerTitle: true,
           actions: [
             IconButton(
@@ -129,9 +184,21 @@ class _ResultPageState extends State<ResultPage> {
               onPressed: () {
                 prefs.toggleFavourite(widget.stop);
               },
+            ),
+            PopupMenuButton<String>(
+              onSelected: optionSelection,
+              itemBuilder: (BuildContext context) {
+                List<String> options = ["Rename", "Clear Custom Name"];
+                return options.map((String option) {
+                  return PopupMenuItem<String>(
+                    enabled: showMenu,
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList();
+              },
             )
           ],
-          title: Text(widget.stop.name.split(", ")[0]),
         ),
         body: buildBody());
   }

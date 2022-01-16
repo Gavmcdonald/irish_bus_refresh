@@ -15,7 +15,7 @@ class StopTile extends StatelessWidget {
     Prefs prefs = Provider.of<Prefs>(context);
     return ListTile(
       title: Text(
-        stop.name.split(', ')[0],
+        stop.customName == "" ? stop.name.split(', ')[0] : stop.customName,
         style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.bold,

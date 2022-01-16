@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
+import 'package:irish_bus_refresh/widgets/favourite_tile.dart';
 import 'package:irish_bus_refresh/widgets/stop_tile.dart';
 import 'package:provider/provider.dart';
 
