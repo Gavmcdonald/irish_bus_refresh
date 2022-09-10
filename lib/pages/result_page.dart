@@ -87,7 +87,7 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   Widget _getAdWidget() {
-    print('getting ad widget');
+    //print('getting ad widget');
     if (_anchoredAdaptiveAd != null && _isLoaded) {
       return Container(
         color: Theme.of(context).backgroundColor,
@@ -239,7 +239,7 @@ class _ResultPageState extends State<ResultPage> {
             child: _loading
                 ? const CircularProgressIndicator()
                 : RefreshIndicator(
-                    onRefresh: () => getStopData(widget.stop.name),
+                    onRefresh: () => getStopData(widget.stop.id),
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 300),
                       children: _results,
