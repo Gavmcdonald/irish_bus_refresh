@@ -22,7 +22,7 @@ class ResultTile extends StatelessWidget {
               ? Text("Due", style: _biggerFont,)
               : Text("$departureTime", style: _biggerFont,),
         ),
-        Divider(),
+        Divider(indent: 16.0,endIndent: 16.0,),
       ],
     );
     ;

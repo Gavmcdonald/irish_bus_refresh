@@ -60,7 +60,7 @@ class _ResultPageState extends State<ResultPage> {
             MediaQuery.of(context).size.width.truncate());
 
     if (size == null) {
-      print('Unable to get height of anchored banner.');
+      //print('Unable to get height of anchored banner.');
       return;
     }
 
@@ -232,16 +232,16 @@ class _ResultPageState extends State<ResultPage> {
     } else {
       return Stack(children: [
         Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: 14),
             child: Align(
-                alignment: Alignment.topCenter, child: Text(statusMessage))),
+                alignment: Alignment.topCenter, child: Text(statusMessage, style: TextStyle(color: Theme.of(context).primaryColor),))),
         Center(
             child: _loading
                 ? const CircularProgressIndicator()
                 : RefreshIndicator(
                     onRefresh: () => getStopData(widget.stop.id),
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 300),
+                      padding: const EdgeInsets.fromLTRB(0, 24, 0, 300),
                       children: _results,
                     ),
                   )),
