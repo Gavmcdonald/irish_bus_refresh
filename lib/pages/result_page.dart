@@ -69,7 +69,9 @@ class _ResultPageState extends State<ResultPage> {
           ? 'ca-app-pub-2091957797827628/7306344533'
           : 'ca-app-pub-2091957797827628/1127531104',
       size: size,
-      request: AdRequest(),
+      request: const AdRequest(
+        nonPersonalizedAds: true
+      ),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
           setState(() {
