@@ -69,6 +69,7 @@ dependencies:
   flutter_markdown: ^0.6.9
   firebase_core: ^1.11.0
   firebase_analytics: ^9.3.4
+  in_app_review: ^2.0.4
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

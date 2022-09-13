@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:irish_bus_refresh/pages/favourite_page.dart';
 import 'package:irish_bus_refresh/pages/map_page.dart';
 import 'package:irish_bus_refresh/pages/search_page.dart';
@@ -10,6 +11,7 @@ import 'package:irish_bus_refresh/pages/settings_page.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
@@ -71,6 +73,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    getReview();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -83,8 +91,11 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MapSample()));
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MapSample()))
+                  .then((value) => getReview());
             },
             icon: const Icon(Icons.location_pin),
             color: Theme.of(context).colorScheme.primary,
@@ -126,6 +137,38 @@ class _MyHomePageState extends State<MyHomePage> {
     if (selection == "Settings") {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const SettingsPage()));
+    }
+  }
+
+  void getReview() async {
+    final InAppReview inAppReview = InAppReview.instance;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool askedForReview = prefs.getBool('askedForReview');
+
+    if (askedForReview == null) {
+      await prefs.setBool('askedForReview', false);
+    }
+
+    if (askedForReview == false) {
+      final int timesOpened = prefs.getInt('timesOpened');
+
+      if (timesOpened == null) {
+        await prefs.setInt('timesOpened', 1);
+      }
+
+      if (timesOpened != null) {
+        if (timesOpened == 30) {
+          if (await inAppReview.isAvailable()) {
+            inAppReview.requestReview();
+          }
+
+          await prefs.setBool('askedForReview', true);
+        } else {
+          await prefs.setInt('timesOpened', timesOpened + 1);
+        }
+      }
     }
   }
 }
