@@ -1,4 +1,6 @@
 //import 'package:app_review/app_review.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -63,11 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Scheduled departures have no real time data and therefore may be more unreliable. "
                   "We filter these out by default to improve reliability."),
               isThreeLine: true,
-              trailing: Checkbox(
-                  value: showScheduledDepartures,
-                  onChanged: (boo) {
-                    toggleShowScheduledDepartures();
-                  }),
+              trailing: getCheckBox(),
             ),
           ),
           const Divider(),
@@ -77,15 +75,6 @@ class _SettingsPageState extends State<SettingsPage> {
             isThreeLine: true,
           ),
           const Divider(),
-          // ListTile(
-          //   title: Text("Leave A Review"),
-          //   onTap: (){
-          //     AppReview.requestReview.then((onValue) {
-          //       print(onValue);
-          //     });
-
-          //   },
-          // ),
           ListTile(
               title: const Text("Privacy Policy"),
               onTap: () {
@@ -98,6 +87,20 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
+  }
+
+  Widget getCheckBox() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return CupertinoSwitch(
+          value: showScheduledDepartures,
+          onChanged: (boo) => toggleShowScheduledDepartures());
+    } else {
+      return Checkbox(
+          value: showScheduledDepartures,
+          onChanged: (boo) {
+            toggleShowScheduledDepartures();
+          });
+    }
   }
 }
 
