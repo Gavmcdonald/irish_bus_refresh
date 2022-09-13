@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/assets/route_data.dart';
 import 'package:irish_bus_refresh/models/stop.dart';
@@ -30,7 +32,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   final myController = TextEditingController();
-  
+
   List _data = [];
   List _filteredData = [];
 
@@ -54,14 +56,22 @@ class _SearchPageState extends State<SearchPage> {
     ));
   }
 
-  Widget searchBox() => Container(
+  Widget searchBox() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: CupertinoSearchTextField(
+          controller: myController,
+          onChanged: (entered) => filterStopList(entered),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+        ),
+      );
+    } else {
+      return Container(
         padding: const EdgeInsets.all(12.0),
         child: TextField(
           controller: myController,
-          onChanged: (entered) {
-            filterStopList(entered);
-          },
-          onTap: () => print(myController.value.text),
+          onChanged: (entered) => filterStopList(entered),
           decoration: InputDecoration(
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -76,17 +86,20 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       );
+    }
+  }
 
   filterStopList(String query) {
     if (query == "") {
       setState(() {
         _filteredData = _data;
       });
-    }  
-     else {
+    } else {
       setState(() {
-        _filteredData =
-            _data.where((stop) => stop.name.toLowerCase().contains(query.toLowerCase())).toList();
+        _filteredData = _data
+            .where(
+                (stop) => stop.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       });
     }
   }
