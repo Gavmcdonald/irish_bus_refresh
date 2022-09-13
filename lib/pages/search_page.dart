@@ -38,28 +38,31 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return (Column(
-      children: <Widget>[
-        searchBox(),
-        Flexible(
-          child: ListView(
-            children: [
-              for (Stop stop in _filteredData)
-                StopTile(
-                  stop: stop,
-                  key: ValueKey(stop),
-                )
-            ],
+    return Padding(
+      padding: getPadding(),
+      child: (Column(
+        children: <Widget>[
+          searchBox(),
+          Flexible(
+            child: ListView(
+              children: [
+                for (Stop stop in _filteredData)
+                  StopTile(
+                    stop: stop,
+                    key: ValueKey(stop),
+                  )
+              ],
+            ),
           ),
-        ),
-      ],
-    ));
+        ],
+      )),
+    );
   }
 
   Widget searchBox() {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: CupertinoSearchTextField(
           controller: myController,
           onChanged: (entered) => filterStopList(entered),
@@ -102,6 +105,14 @@ class _SearchPageState extends State<SearchPage> {
             .toList();
       });
     }
+  }
+
+    getPadding(){
+    if(defaultTargetPlatform == TargetPlatform.iOS){
+      return const EdgeInsets.only(top: 36);
+    }
+
+    return const EdgeInsets.fromLTRB(0, 0, 0, 0);
   }
 
   loadStopsFromAsset() {}

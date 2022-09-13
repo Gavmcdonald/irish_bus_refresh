@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -78,7 +79,32 @@ class MapSampleState extends State<MapSample> {
   @override
   Widget build(BuildContext context) {
     _determinePosition();
-    print('number of filtered markers${_filteredMarkers.length}');
+
+    if(defaultTargetPlatform == TargetPlatform.iOS){
+      return GoogleMap(
+        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 20.0),
+        myLocationButtonEnabled: true,
+        markers: _filteredMarkers.toSet(),
+        onCameraMove: (position) {
+          cameraPosition = position.target;
+        },
+        onCameraIdle: () {
+          getNearbyStops(cameraPosition);
+        },
+        indoorViewEnabled: false,
+        myLocationEnabled: true,
+        zoomControlsEnabled: true,
+        mapToolbarEnabled: false,
+        compassEnabled: false,
+        mapType: MapType.normal,
+        initialCameraPosition: _ireland,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+          _goToTheLake();
+        },
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
