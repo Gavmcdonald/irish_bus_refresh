@@ -24,10 +24,13 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   final controller = TextEditingController();
+  final _client = http.Client();
+
   String statusMessage = "";
   DateTime lastSynced;
+
   List<Widget> _results = [];
-  final _client = http.Client();
+
   bool hasConnection = true;
   bool showScheduledDepartures = false;
 
@@ -69,9 +72,7 @@ class _ResultPageState extends State<ResultPage> {
           ? 'ca-app-pub-2091957797827628/7306344533'
           : 'ca-app-pub-2091957797827628/1127531104',
       size: size,
-      request: const AdRequest(
-        nonPersonalizedAds: true
-      ),
+      request: const AdRequest(nonPersonalizedAds: true),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
           setState(() {
@@ -165,23 +166,33 @@ class _ResultPageState extends State<ResultPage> {
       showMenu = true;
     }
 
+    var primaryColor2 = Theme.of(context).primaryColor;
     return Scaffold(
         appBar: AppBar(
+          iconTheme: IconThemeData(color: primaryColor2),
+          elevation: 0,
+          backgroundColor: Theme.of(context).canvasColor,
           title: widget.stop.hasCustomName
-              ? Text(widget.stop.customName)
-              : Text(widget.stop.name.split(', ')[0]),
+              ? Text(
+                  widget.stop.customName,
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                )
+              : Text(
+                  widget.stop.name.split(', ')[0],
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
           centerTitle: true,
           actions: [
             IconButton(
               padding: const EdgeInsets.all(0),
               icon: prefs.favourites.contains(widget.stop)
-                  ? const Icon(
+                  ? Icon(
                       Icons.star,
-                      color: Colors.white,
+                      color: Theme.of(context).primaryColor,
                     )
-                  : const Icon(
+                  : Icon(
                       Icons.star_border,
-                      color: Colors.white,
+                      color: Theme.of(context).primaryColor,
                     ),
               onPressed: () {
                 prefs.toggleFavourite(widget.stop);
@@ -236,7 +247,11 @@ class _ResultPageState extends State<ResultPage> {
         Padding(
             padding: const EdgeInsets.only(top: 14),
             child: Align(
-                alignment: Alignment.topCenter, child: Text(statusMessage, style: TextStyle(color: Theme.of(context).primaryColor),))),
+                alignment: Alignment.topCenter,
+                child: Text(
+                  statusMessage,
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ))),
         Center(
             child: _loading
                 ? const CircularProgressIndicator()

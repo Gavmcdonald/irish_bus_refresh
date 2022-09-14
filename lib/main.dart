@@ -101,41 +101,39 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 getReview() async {
-    final InAppReview inAppReview = InAppReview.instance;
+  final InAppReview inAppReview = InAppReview.instance;
 
-    final prefs = await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
-    final bool askedForReview = prefs.getBool('askedForReview');
+  final bool askedForReview = prefs.getBool('askedForReview');
 
-    if (askedForReview == null) {
-      await prefs.setBool('askedForReview', false);
+  if (askedForReview == null) {
+    await prefs.setBool('askedForReview', false);
+  }
+
+  if (askedForReview == false) {
+    final int timesOpened = prefs.getInt('timesOpened');
+
+    if (timesOpened == null) {
+      await prefs.setInt('timesOpened', 1);
     }
 
-    if (askedForReview == false) {
-      final int timesOpened = prefs.getInt('timesOpened');
-
-      if (timesOpened == null) {
-        await prefs.setInt('timesOpened', 1);
-      }
-
-      if (timesOpened != null) {
-        if (timesOpened == 30) {
-          if (await inAppReview.isAvailable()) {
-            inAppReview.requestReview();
-          }
-
-          await prefs.setBool('askedForReview', true);
-        } else {
-          await prefs.setInt('timesOpened', timesOpened + 1);
+    if (timesOpened != null) {
+      if (timesOpened == 30) {
+        if (await inAppReview.isAvailable()) {
+          inAppReview.requestReview();
         }
+
+        await prefs.setBool('askedForReview', true);
+      } else {
+        await prefs.setInt('timesOpened', timesOpened + 1);
       }
     }
   }
+}
 
 getAppBar(context, optionSelection) {
-
-
-  if(defaultTargetPlatform == TargetPlatform.iOS){
+  if (defaultTargetPlatform == TargetPlatform.iOS) {
     return AppBar(
       toolbarHeight: 0,
       toolbarOpacity: 0,
@@ -145,78 +143,69 @@ getAppBar(context, optionSelection) {
   }
 
   return AppBar(
-        systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.light,
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark),
-        elevation: 0,
-        backgroundColor: Theme.of(context).canvasColor,
-        actions:  [
-          if(defaultTargetPlatform != TargetPlatform.iOS)
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MapSample()));
-            },
-            icon: const Icon(Icons.location_pin),
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          if(defaultTargetPlatform != TargetPlatform.iOS)
-          PopupMenuButton<String>(
-            icon: Icon(
-              Icons.adaptive.more,
-              color: Theme.of(context).primaryColor
-            ),
-            onSelected: optionSelection,
-            itemBuilder: (BuildContext context) {
-              List<String> options = ["Settings"];
-              return options.map((String option) {
-                return PopupMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList();
-            },
-          )
-        ],
-      );
+    systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark),
+    elevation: 0,
+    backgroundColor: Theme.of(context).canvasColor,
+    actions: [
+      if (defaultTargetPlatform != TargetPlatform.iOS)
+        IconButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MapSample()));
+          },
+          icon: const Icon(Icons.location_pin),
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      if (defaultTargetPlatform != TargetPlatform.iOS)
+        PopupMenuButton<String>(
+          icon:
+              Icon(Icons.adaptive.more, color: Theme.of(context).primaryColor),
+          onSelected: optionSelection,
+          itemBuilder: (BuildContext context) {
+            List<String> options = ["Settings"];
+            return options.map((String option) {
+              return PopupMenuItem<String>(
+                value: option,
+                child: Text(option),
+              );
+            }).toList();
+          },
+        )
+    ],
+  );
 }
 
 getNavBar(_selectedIndex, _onItemTapped, context) {
-
-  if(defaultTargetPlatform !=  TargetPlatform.iOS){
+  if (defaultTargetPlatform != TargetPlatform.iOS) {
     return CupertinoTabBar(
-       //activeColor: Theme.of(context).primaryColor,
-       items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.star_border_outlined), label: 'favourites')
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+      //activeColor: Theme.of(context).primaryColor,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.star_border_outlined), label: 'favourites')
+      ],
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
     );
-  }
-
-  else { 
-
+  } else {
     return CupertinoTabBar(
       border: const Border(),
       iconSize: 24.0,
       //inactiveColor: Theme.of(context).primaryColor,
-        items:  const [
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.star), label: 'Favourites'),
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.map), label: 'Map'),
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.settings), label: 'Settings'),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      );
+      items: const [
+        BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.search), label: 'Search'),
+        BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.star), label: 'Favourites'),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.map), label: 'Map'),
+        BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.settings), label: 'Settings'),
+      ],
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+    );
   }
-
 }
