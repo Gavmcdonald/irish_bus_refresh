@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/assets/route_data.dart';
 import 'package:irish_bus_refresh/models/stop.dart';
@@ -30,38 +32,49 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   final myController = TextEditingController();
-  
+
   List _data = [];
   List _filteredData = [];
 
   @override
   Widget build(BuildContext context) {
-    return (Column(
-      children: <Widget>[
-        searchBox(),
-        Flexible(
-          child: ListView(
-            children: [
-              for (Stop stop in _filteredData)
-                StopTile(
-                  stop: stop,
-                  key: ValueKey(stop),
-                )
-            ],
+    return Padding(
+      padding: getPadding(),
+      child: (Column(
+        children: <Widget>[
+          searchBox(),
+          Flexible(
+            child: ListView(
+              children: [
+                for (Stop stop in _filteredData)
+                  StopTile(
+                    stop: stop,
+                    key: ValueKey(stop),
+                  )
+              ],
+            ),
           ),
-        ),
-      ],
-    ));
+        ],
+      )),
+    );
   }
 
-  Widget searchBox() => Container(
+  Widget searchBox() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: CupertinoSearchTextField(
+          controller: myController,
+          onChanged: (entered) => filterStopList(entered),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+        ),
+      );
+    } else {
+      return Container(
         padding: const EdgeInsets.all(12.0),
         child: TextField(
           controller: myController,
-          onChanged: (entered) {
-            filterStopList(entered);
-          },
-          onTap: () => print(myController.value.text),
+          onChanged: (entered) => filterStopList(entered),
           decoration: InputDecoration(
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -76,19 +89,30 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       );
+    }
+  }
 
   filterStopList(String query) {
     if (query == "") {
       setState(() {
         _filteredData = _data;
       });
-    }  
-     else {
+    } else {
       setState(() {
-        _filteredData =
-            _data.where((stop) => stop.name.toLowerCase().contains(query.toLowerCase())).toList();
+        _filteredData = _data
+            .where(
+                (stop) => stop.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       });
     }
+  }
+
+    getPadding(){
+    if(defaultTargetPlatform == TargetPlatform.iOS){
+      return const EdgeInsets.only(top: 36);
+    }
+
+    return const EdgeInsets.fromLTRB(0, 0, 0, 0);
   }
 
   loadStopsFromAsset() {}

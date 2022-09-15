@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ResultTile extends StatelessWidget {
-  const ResultTile({@required this.route, @required this.destination, @required this.departureTime });
+  const ResultTile({Key key, @required this.route, @required this.destination, @required this.departureTime }) : super(key: key);
 
   final String route;
   final String destination;
@@ -22,7 +22,7 @@ class ResultTile extends StatelessWidget {
               ? Text("Due", style: _biggerFont,)
               : Text("$departureTime", style: _biggerFont,),
         ),
-        Divider(indent: 16.0,endIndent: 16.0,),
+        const Divider(indent: 16.0,endIndent: 16.0,height: 4,),
       ],
     );
     ;

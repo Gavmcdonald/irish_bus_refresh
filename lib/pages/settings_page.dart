@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:package_info/package_info.dart';
@@ -49,6 +50,44 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    if(defaultTargetPlatform == TargetPlatform.iOS) {
+      return Padding(
+        padding: getPadding(),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+              child: ListTile(
+                title: const Text("Show Scheduled Departures"),
+                subtitle: const Text(
+                    "Scheduled departures have no real time data and therefore may be more unreliable. "
+                    "We filter these out by default to improve reliability."),
+                isThreeLine: true,
+                trailing: getCheckBox(),
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              title: const Text("About App"),
+              subtitle: Text("Version: $version\nBuild Number: $buildNumber"),
+              isThreeLine: true,
+            ),
+            const Divider(),
+            ListTile(
+                title: const Text("Privacy Policy"),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          settings: const RouteSettings(name: "Privacy Policy"),
+                          builder: (context) => const PrivacyPolicy()));
+                })
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -101,6 +140,14 @@ class _SettingsPageState extends State<SettingsPage> {
             toggleShowScheduledDepartures();
           });
     }
+  }
+
+    getPadding(){
+    if(defaultTargetPlatform == TargetPlatform.iOS){
+      return const EdgeInsets.only(top: 32);
+    }
+
+    return const EdgeInsets.fromLTRB(0, 0, 0, 0);
   }
 }
 
