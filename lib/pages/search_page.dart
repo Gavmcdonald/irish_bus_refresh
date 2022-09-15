@@ -45,6 +45,7 @@ class _SearchPageState extends State<SearchPage> {
           searchBox(),
           Flexible(
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [
                 for (Stop stop in _filteredData)
                   StopTile(

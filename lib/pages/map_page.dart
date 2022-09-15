@@ -64,7 +64,7 @@ class MapSampleState extends State<MapSample> {
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return GoogleMap(
-        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 15.0),
+        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 18.0),
         myLocationButtonEnabled: true,
         markers: _filteredMarkers.toSet(),
         onCameraMove: (position) {
