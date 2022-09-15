@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
@@ -198,19 +200,24 @@ class _ResultPageState extends State<ResultPage> {
                 prefs.toggleFavourite(widget.stop);
               },
             ),
-            PopupMenuButton<String>(
-              onSelected: optionSelection,
-              itemBuilder: (BuildContext context) {
-                List<String> options = ["Rename", "Clear Custom Name"];
-                return options.map((String option) {
-                  return PopupMenuItem<String>(
-                    enabled: showMenu,
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList();
-              },
-            )
+            if (defaultTargetPlatform != TargetPlatform.iOS)
+              PopupMenuButton<String>(
+                onSelected: optionSelection,
+                itemBuilder: (BuildContext context) {
+                  List<String> options = ["Rename", "Clear Custom Name"];
+                  return options.map((String option) {
+                    return PopupMenuItem<String>(
+                      enabled: showMenu,
+                      value: option,
+                      child: Text(option),
+                    );
+                  }).toList();
+                },
+              ),
+            if (defaultTargetPlatform == TargetPlatform.iOS)
+              IconButton(
+                  onPressed: () => _showActionSheet(prefs),
+                  icon: Icon(CupertinoIcons.ellipsis))
           ],
         ),
         body: buildBody());
@@ -243,25 +250,52 @@ class _ResultPageState extends State<ResultPage> {
         ],
       );
     } else {
+      Widget indicator = const CircularProgressIndicator();
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        indicator = const CupertinoActivityIndicator();
+      }
       return Stack(children: [
-        Padding(
-            padding: const EdgeInsets.only(top: 14),
-            child: Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  statusMessage,
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ))),
         Center(
             child: _loading
-                ? const CircularProgressIndicator()
-                : RefreshIndicator(
-                    onRefresh: () => getStopData(widget.stop.id),
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(0, 24, 0, 300),
-                      children: _results,
-                    ),
-                  )),
+                ? indicator
+                : (defaultTargetPlatform == TargetPlatform.iOS)
+                    ? CustomScrollView(
+                        //padding: const EdgeInsets.fromLTRB(0, 24, 0, 300),
+                        slivers: [
+                          if (defaultTargetPlatform == TargetPlatform.iOS)
+                            CupertinoSliverRefreshControl(
+                              onRefresh: () => getStopData(widget.stop.id),
+                            ),
+                          SliverList(
+                              delegate: SliverChildListDelegate([
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                statusMessage,
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                            ),
+                            ..._results
+                          ])),
+                        ],
+                      )
+                    : RefreshIndicator(
+                        child: ListView(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                statusMessage,
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                            ),
+                            ..._results
+                          ],
+                        ),
+                        onRefresh: () => getStopData(widget.stop.id),
+                      )),
         Align(
           alignment: Alignment.bottomCenter,
           child: _getAdWidget(),
@@ -395,5 +429,66 @@ class _ResultPageState extends State<ResultPage> {
   void dispose() {
     super.dispose();
     _anchoredAdaptiveAd?.dispose();
+  }
+
+  _showActionSheet(prefs) {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) => CupertinoActionSheet(
+              actions: [
+                CupertinoActionSheetAction(
+                    onPressed: _showCupertinoDialog,
+                    child: Text("Rename Stop")),
+                CupertinoActionSheetAction(
+                    onPressed: () {
+                      widget.stop.customName = "";
+                      prefs.updateCustomName(widget.stop);
+                    },
+                    child: Text("Clear Custom Name")),
+              ],
+
+              //TODO: add in the option to hide or show scheduled departures
+              cancelButton: CupertinoActionSheetAction(
+                child: Text("Close"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ));
+  }
+
+  _showCupertinoDialog() {
+    Prefs prefs = Provider.of<Prefs>(context, listen: false);
+    showCupertinoDialog(
+        context: context,
+        builder: ((context) => CupertinoAlertDialog(
+              title: Text(
+                "Rename Stop",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+              content: CupertinoTextField(
+                autofocus: true,
+                controller: controller,
+                placeholder: widget.stop.name.split(", ")[0],
+              ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: Text("Close"),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                CupertinoDialogAction(
+                  child: Text("Save",
+                      style: TextStyle(color: Theme.of(context).accentColor)),
+                  onPressed: () {
+                    controller.value.text == ""
+                        ? widget.stop.customName = ""
+                        : widget.stop.customName = controller.value.text;
+                    prefs.updateCustomName(widget.stop);
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            )));
   }
 }
