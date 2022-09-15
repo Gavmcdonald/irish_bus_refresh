@@ -49,3 +49,5 @@ ios/Podfile.lock
 .gitignore
 pubspec.lock
 android/app/src/main/java/io/flutter/app/FlutterMultiDexApplication.java
+pubspec.lock
+pubspec.lock

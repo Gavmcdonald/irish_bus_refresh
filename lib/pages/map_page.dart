@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,11 +9,8 @@ import 'package:irish_bus_refresh/models/stop.dart';
 import 'package:irish_bus_refresh/pages/result_page.dart';
 import 'dart:async';
 
-import 'package:permission_handler/permission_handler.dart';
-
 class MapSample extends StatefulWidget {
   const MapSample({Key key}) : super(key: key);
-
   @override
   State<MapSample> createState() => MapSampleState();
 }
@@ -24,12 +20,10 @@ class MapSampleState extends State<MapSample> {
 
   List<Marker> _allMarkers = [];
   List<Marker> _filteredMarkers = [];
-  double _searchRadius = 5.0;
 
   @override
   initState() {
     List<Marker> allMarkers = [];
-
     String data = routeData;
     var parsed = json.decode(data);
 
@@ -51,15 +45,11 @@ class MapSampleState extends State<MapSample> {
         markerId: MarkerId(stop.stopNumber),
         position: LatLng(stop.lat, stop.long),
       ));
-
-      //   Marker(
-      //       markerId: MarkerId(stop.stopNumber),
-      //       position: LatLng(stop.lat, stop.long)),
-      // );
     }
 
     _allMarkers = allMarkers;
     getNearbyStops(_ireland.target);
+    _determinePosition();
     super.initState();
   }
 
@@ -67,22 +57,14 @@ class MapSampleState extends State<MapSample> {
 
   static const CameraPosition _ireland = CameraPosition(
     target: LatLng(53.07316879898958, -7.132904045283795),
-    zoom: 12,
+    zoom: 15,
   );
-
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 
   @override
   Widget build(BuildContext context) {
-    _determinePosition();
-
-    if(defaultTargetPlatform == TargetPlatform.iOS){
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return GoogleMap(
-        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 20.0),
+        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 15.0),
         myLocationButtonEnabled: true,
         markers: _filteredMarkers.toSet(),
         onCameraMove: (position) {
@@ -130,7 +112,7 @@ class MapSampleState extends State<MapSample> {
         initialCameraPosition: _ireland,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
-          _goToTheLake();
+          //_goToTheLake(); //TODO: remove this, location should be gotten in init state
         },
       ),
     );
@@ -141,25 +123,24 @@ class MapSampleState extends State<MapSample> {
     try {
       Position pos = await Geolocator.getCurrentPosition();
       CameraPosition user =
-          CameraPosition(target: LatLng(pos.latitude, pos.longitude));
+          CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 15);
       controller.animateCamera(CameraUpdate.newCameraPosition(user));
     } on Exception catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
     controller.getVisibleRegion();
   }
 
   filterMarkers(LatLng cameraPosition) {
-    print(cameraPosition.toString());
+   
   }
 
   getNearbyStops(LatLng cameraPosition) {
-    double searchRadius = 3.0;
-
-    const double pi = 3.1415926535897932;
-
+    double searchRadius = 2.0;
     List<Marker> markers = [];
-    _allMarkers.forEach((stop) {
+    for (var stop in _allMarkers) {
       if (cameraPosition.latitude != null) {
         var stoplong = stop.position.longitude;
         var stoplat = stop.position.latitude;
@@ -176,7 +157,7 @@ class MapSampleState extends State<MapSample> {
           markers.add(stop);
         }
       }
-    });
+    }
 
     setState(() {
       _filteredMarkers = markers;
