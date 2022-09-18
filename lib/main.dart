@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: <NavigatorObserver>[observer],
-      title: 'Flutter Demo',
+      title: 'Irish Bus Real Time',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
