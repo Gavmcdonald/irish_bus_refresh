@@ -50,32 +50,6 @@ class _AppHomePageState extends State<AppHomePage> {
   }
 }
 
-getNavBar(_selectedIndex, _onItemTapped, context) {
-  bool isiOS = (defaultTargetPlatform == TargetPlatform.iOS);
-  Icon searchIcon =
-      isiOS ? const Icon(CupertinoIcons.search) : const Icon(Icons.search);
-  Icon favoriteIcon = isiOS
-      ? const Icon(CupertinoIcons.star)
-      : const Icon(Icons.star_border_outlined);
-
-  return CupertinoTabBar(
-    border: const Border(),
-    iconSize: 28,
-    items: [
-      BottomNavigationBarItem(icon: searchIcon, label: 'Search'),
-      BottomNavigationBarItem(icon: favoriteIcon, label: 'favourites'),
-      if (isiOS) ...[
-        const BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.map), label: 'Map'),
-        const BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.settings), label: 'Settings'),
-      ]
-    ],
-    currentIndex: _selectedIndex,
-    onTap: _onItemTapped,
-  );
-}
-
 promptUserForReview() async {
   final InAppReview inAppReview = InAppReview.instance;
   final devicePreferences = await SharedPreferences.getInstance();
@@ -104,4 +78,30 @@ promptUserForReview() async {
       }
     }
   }
+}
+
+getNavBar(_selectedIndex, _onItemTapped, context) {
+  bool isiOS = (defaultTargetPlatform == TargetPlatform.iOS);
+  Icon searchIcon =
+      isiOS ? const Icon(CupertinoIcons.search) : const Icon(Icons.search);
+  Icon favoriteIcon = isiOS
+      ? const Icon(CupertinoIcons.star)
+      : const Icon(Icons.star_border_outlined);
+
+  return CupertinoTabBar(
+    border: const Border(),
+    iconSize: 28,
+    items: [
+      BottomNavigationBarItem(icon: searchIcon, label: 'Search'),
+      BottomNavigationBarItem(icon: favoriteIcon, label: 'favourites'),
+      if (isiOS) ...[
+        const BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.map), label: 'Map'),
+        const BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.settings), label: 'Settings'),
+      ]
+    ],
+    currentIndex: _selectedIndex,
+    onTap: _onItemTapped,
+  );
 }
