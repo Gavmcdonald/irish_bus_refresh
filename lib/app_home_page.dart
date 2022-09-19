@@ -6,7 +6,9 @@ import 'package:irish_bus_refresh/pages/favourite_page.dart';
 import 'package:irish_bus_refresh/pages/map_page.dart';
 import 'package:irish_bus_refresh/pages/search_page.dart';
 import 'package:irish_bus_refresh/pages/settings_page.dart';
+import 'package:irish_bus_refresh/providers/stop_list_provider.dart';
 import 'package:irish_bus_refresh/widgets/main_app_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppHomePage extends StatefulWidget {
@@ -20,7 +22,7 @@ class _AppHomePageState extends State<AppHomePage> {
   int _selectedTab = 1;
 
   static const List<Widget> _tabOptions = <Widget>[
-    SearchPage(),
+    SearchTab(),
     FavouritesPage(),
     MapSample(),
     SettingsPage(),
@@ -40,11 +42,14 @@ class _AppHomePageState extends State<AppHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(),
-      bottomNavigationBar: getNavBar(_selectedTab, _onTabTapped, context),
-      body: Center(
-        child: _tabOptions.elementAt(_selectedTab),
+    return ChangeNotifierProvider(
+      create: (context) => StopList(),
+      child: Scaffold(
+        appBar: const MainAppBar(),
+        bottomNavigationBar: getNavBar(_selectedTab, _onTabTapped, context),
+        body: Center(
+          child: _tabOptions.elementAt(_selectedTab),
+        ),
       ),
     );
   }

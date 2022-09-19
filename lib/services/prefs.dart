@@ -49,8 +49,6 @@ class Prefs with ChangeNotifier {
 
   _loadFavourites() async {
 
-    print('loading');
-
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String data = prefs.getString(favouriteKey) ?? '';
