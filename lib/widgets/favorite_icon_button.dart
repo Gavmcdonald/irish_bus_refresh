@@ -19,11 +19,11 @@ class FavoriteIconButton extends StatelessWidget {
       icon: prefs.favourites.contains(stop)
           ? Icon(
               Icons.star,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             )
           : Icon(
               Icons.star_border,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
       onPressed: () {
         prefs.toggleFavourite(stop);

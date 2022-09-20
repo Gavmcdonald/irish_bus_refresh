@@ -84,20 +84,20 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable - triggers rebuild when prefs changes, unused_local_variable
     Prefs prefs = Provider.of<Prefs>(context);
-    var primaryColor2 = Theme.of(context).primaryColor;
+    var primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
         appBar: AppBar(
-          iconTheme: IconThemeData(color: primaryColor2),
+          iconTheme: IconThemeData(color: primaryColor),
           elevation: 0,
           backgroundColor: Theme.of(context).canvasColor,
           title: widget.stop.hasCustomName
               ? Text(
                   widget.stop.customName,
-                  style: TextStyle(color: Theme.of(context).primaryColor),
+                  style: TextStyle(color: primaryColor),
                 )
               : Text(
                   widget.stop.name.split(', ')[0],
-                  style: TextStyle(color: Theme.of(context).primaryColor),
+                  style: TextStyle(color: primaryColor),
                 ),
           centerTitle: true,
           actions: [

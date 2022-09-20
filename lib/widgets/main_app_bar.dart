@@ -45,7 +45,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         PopupMenuButton<String>(
           icon:
-              Icon(Icons.adaptive.more, color: Theme.of(context).primaryColor),
+              Icon(Icons.adaptive.more, color: Theme.of(context).colorScheme.primary),
           onSelected: optionSelection,
           itemBuilder: (BuildContext context) {
             List<String> options = ["Settings"];

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:irish_bus_refresh/models/stop.dart';
 import 'package:irish_bus_refresh/widgets/search_box.dart';
 import 'package:irish_bus_refresh/widgets/stop_tile.dart';
 import 'package:provider/provider.dart';
@@ -21,24 +20,35 @@ class _SearchTabState extends State<SearchTab> {
           ? const EdgeInsets.only(top: 36)
           : const EdgeInsets.fromLTRB(0, 0, 0, 0);
 
+  StopList stopList;
+
+  @override
+  void didChangeDependencies() {
+    stopList = Provider.of<StopList>(context);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: searchBoxPadding,
       child: (Column(
         children: <Widget>[
-          SearchBox(),
+          const SearchBox(),
           Flexible(
-            child: ListView(
+            child: ListView.builder(
+              itemCount: stopList.filteredStopList.length,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              children: [
-                for (Stop stop
-                    in Provider.of<StopList>(context).filteredStopList)
-                  StopTile(
-                    stop: stop,
-                    key: ValueKey(stop),
-                  )
-              ],
+              prototypeItem: StopTile(
+                    stop: stopList.filteredStopList.first,
+                    key: ValueKey(stopList.filteredStopList.first),
+                  ),
+              itemBuilder: ((context, index) {
+                return StopTile(
+                    stop: stopList.filteredStopList[index],
+                    key: ValueKey(stopList.filteredStopList[index]),
+                  );
+              }),
             ),
           ),
         ],

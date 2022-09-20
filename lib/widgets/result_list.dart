@@ -70,7 +70,7 @@ class _ResultListState extends State<ResultList> {
                               child: Text(
                                 network.statusMessage,
                                 style: TextStyle(
-                                    color: Theme.of(context).primaryColor),
+                                    color: Theme.of(context).colorScheme.primary),
                               ),
                             ),
                             ...network.stopResults
@@ -85,7 +85,7 @@ class _ResultListState extends State<ResultList> {
                               child: Text(
                                 network.statusMessage,
                                 style: TextStyle(
-                                    color: Theme.of(context).primaryColor),
+                                    color: Theme.of(context).colorScheme.primary),
                               ),
                             ),
                             ...network.stopResults
