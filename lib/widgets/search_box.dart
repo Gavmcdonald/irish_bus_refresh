@@ -4,8 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/providers/stop_list_provider.dart';
 import 'package:provider/provider.dart';
 
-class SearchBox extends StatelessWidget {
-  SearchBox({Key key}) : super(key: key);
+class SearchBox extends StatefulWidget {
+  const SearchBox({Key key}) : super(key: key);
+
+  @override
+  State<SearchBox> createState() => _SearchBoxState();
+}
+
+class _SearchBoxState extends State<SearchBox> {
   final searchBoxController = TextEditingController();
 
   @override

@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
-import 'package:irish_bus_refresh/widgets/favourite_tile.dart';
 import 'package:irish_bus_refresh/widgets/stop_tile.dart';
 import 'package:provider/provider.dart';
-
 
 class FavouritesPage extends StatelessWidget {
   const FavouritesPage({Key key}) : super(key: key);
@@ -13,48 +11,41 @@ class FavouritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Prefs prefs = Provider.of<Prefs>(context);
 
-    if(prefs.favourites.isEmpty){
-      return Center(
-        child: Text("You haven't added any favourites yet")
-      );
+    if (prefs.favourites.isEmpty) {
+      return const Center(child: Text("You haven't added any favourites yet"));
     }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
       child: ReorderableListView(
-        onReorder: (old_index, new_index) {
-          var favourite = prefs.favourites[old_index];
-          prefs.favourites.removeAt(old_index);
-          print("$old_index and $new_index");
+        onReorder: (oldIndex, newIndex) {
+          var favourite = prefs.favourites[oldIndex];
+          prefs.favourites.removeAt(oldIndex);
 
-          if(old_index > new_index){
-            print(" old less than new");
-            prefs.favourites.insert(new_index, favourite);
-            print(prefs.favourites.length);
-          }
-
-          else if(new_index > prefs.favourites.length){
+          if (oldIndex > newIndex) {
+            prefs.favourites.insert(newIndex, favourite);
+          } else if (newIndex > prefs.favourites.length) {
             prefs.favourites.add(favourite);
-          }
-          else{
-            prefs.favourites.insert(new_index-1, favourite);
+          } else {
+            prefs.favourites.insert(newIndex - 1, favourite);
           }
 
-          
           prefs.saveFavourites();
         },
-        padding: EdgeInsets.all(4),
+        padding: const EdgeInsets.all(4),
         children: [
-          for (var favourite in prefs.favourites) 
-            StopTile(stop: favourite, key: ValueKey(favourite),)
+          for (var favourite in prefs.favourites)
+            StopTile(
+              stop: favourite,
+              key: ValueKey(favourite),
+            )
         ],
       ),
     );
-    
   }
 
-  getPadding(){
-    if(defaultTargetPlatform == TargetPlatform.iOS){
+  getPadding() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return const EdgeInsets.only(top: 32);
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:irish_bus_refresh/providers/network_provider.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,16 +30,18 @@ class MyApp extends StatelessWidget {
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorObservers: <NavigatorObserver>[observer],
-      title: 'Irish Bus Real Time',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => Network(),
+      child: MaterialApp(
+        navigatorObservers: <NavigatorObserver>[observer],
+        title: 'Irish Bus Real Time',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const AppHomePage(),
       ),
-      home: const AppHomePage(),
     );
   }
 }
