@@ -5,15 +5,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:irish_bus_refresh/models/stop.dart';
 import 'package:irish_bus_refresh/services/prefs.dart';
+import 'package:irish_bus_refresh/widgets/android_popup_menu.dart';
+import 'package:irish_bus_refresh/widgets/ios_action_sheet.dart';
 import 'package:irish_bus_refresh/widgets/result_tile.dart';
 import 'package:provider/provider.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/favorite_icon_button.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key key, @required this.stop}) : super(key: key);
@@ -25,7 +28,6 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
-  final controller = TextEditingController();
   final _client = http.Client();
 
   String statusMessage = "";
@@ -42,11 +44,11 @@ class _ResultPageState extends State<ResultPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if(_isLoaded == false){
+    if (_isLoaded == false) {
       _loadAd();
     }
-    
   }
+
   getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -76,9 +78,7 @@ class _ResultPageState extends State<ResultPage> {
           ? 'ca-app-pub-2091957797827628/7306344533'
           : 'ca-app-pub-2091957797827628/1127531104',
       size: size,
-      request: const AdRequest(
-        nonPersonalizedAds: true
-      ),
+      request: const AdRequest(nonPersonalizedAds: true),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
           setState(() {
@@ -120,58 +120,6 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     Prefs prefs = Provider.of<Prefs>(context);
-    void optionSelection(String selection) {
-      if (selection == "Rename") {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                elevation: 10,
-                title: Text(
-                  "Rename Stop",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).accentColor),
-                ),
-                content: TextField(
-                  autofocus: true,
-                  controller: controller,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4)),
-                      hintText: widget.stop.name.split(", ")[0]),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text("Close"),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  TextButton(
-                    child: Text("Save",
-                        style: TextStyle(color: Theme.of(context).accentColor)),
-                    onPressed: () {
-                      controller.value.text == ""
-                          ? widget.stop.customName = ""
-                          : widget.stop.customName = controller.value.text;
-                      prefs.updateCustomName(widget.stop);
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
-      }
-
-      if (selection == "Clear Custom Name") {
-        widget.stop.customName = "";
-        prefs.updateCustomName(widget.stop);
-      }
-    }
-
-    bool showMenu = false;
-    if (prefs.favourites.contains(widget.stop)) {
-      showMenu = true;
-    }
-
     var primaryColor2 = Theme.of(context).primaryColor;
     return Scaffold(
         appBar: AppBar(
@@ -189,39 +137,18 @@ class _ResultPageState extends State<ResultPage> {
                 ),
           centerTitle: true,
           actions: [
-            IconButton(
-              padding: const EdgeInsets.all(0),
-              icon: prefs.favourites.contains(widget.stop)
-                  ? Icon(
-                      Icons.star,
-                      color: Theme.of(context).primaryColor,
-                    )
-                  : Icon(
-                      Icons.star_border,
-                      color: Theme.of(context).primaryColor,
-                    ),
-              onPressed: () {
-                prefs.toggleFavourite(widget.stop);
-              },
-            ),
+            FavoriteIconButton(stop: widget.stop),
             if (defaultTargetPlatform != TargetPlatform.iOS)
-              PopupMenuButton<String>(
-                onSelected: optionSelection,
-                itemBuilder: (BuildContext context) {
-                  List<String> options = ["Rename", "Clear Custom Name"];
-                  return options.map((String option) {
-                    return PopupMenuItem<String>(
-                      enabled: showMenu,
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList();
-                },
+              AndroidPopupMenu(
+                stop: widget.stop,
               ),
             if (defaultTargetPlatform == TargetPlatform.iOS)
               IconButton(
-                  onPressed: () => _showActionSheet(prefs),
-                  icon: Icon(CupertinoIcons.ellipsis))
+                  onPressed: () => showCupertinoModalPopup(
+                      context: context,
+                      builder: ((context) =>
+                          IOSActionSheet(stop: widget.stop))),
+                  icon: const Icon(CupertinoIcons.ellipsis))
           ],
         ),
         body: buildBody());
@@ -425,74 +352,11 @@ class _ResultPageState extends State<ResultPage> {
       // loading = false;
       // notifyListeners();
     }
-
-    minutesSincelastSync() {}
   }
 
   @override
   void dispose() {
     super.dispose();
     _anchoredAdaptiveAd?.dispose();
-  }
-
-  _showActionSheet(prefs) {
-    showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => CupertinoActionSheet(
-              actions: [
-                CupertinoActionSheetAction(
-                    onPressed: _showCupertinoDialog,
-                    child: Text("Rename Stop")),
-                CupertinoActionSheetAction(
-                    onPressed: () {
-                      widget.stop.customName = "";
-                      prefs.updateCustomName(widget.stop);
-                    },
-                    child: Text("Clear Custom Name")),
-              ],
-
-              //TODO: add in the option to hide or show scheduled departures
-              cancelButton: CupertinoActionSheetAction(
-                child: Text("Close"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ));
-  }
-
-  _showCupertinoDialog() {
-    Prefs prefs = Provider.of<Prefs>(context, listen: false);
-    showCupertinoDialog(
-        context: context,
-        builder: ((context) => CupertinoAlertDialog(
-              title: Text(
-                "Rename Stop",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Theme.of(context).accentColor),
-              ),
-              content: CupertinoTextField(
-                autofocus: true,
-                controller: controller,
-                placeholder: widget.stop.name.split(", ")[0],
-              ),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  child: Text("Close"),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                CupertinoDialogAction(
-                  child: Text("Save",
-                      style: TextStyle(color: Theme.of(context).accentColor)),
-                  onPressed: () {
-                    controller.value.text == ""
-                        ? widget.stop.customName = ""
-                        : widget.stop.customName = controller.value.text;
-                    prefs.updateCustomName(widget.stop);
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            )));
   }
 }
