@@ -8,7 +8,6 @@ class ThemeProvider with ChangeNotifier {
   
 
   ThemeProvider(_initialTheme) {
-    print("theme provider initial theme: ${_initialTheme.toString()}");
    selectedThemeMode = _initialTheme;
   }
 
@@ -20,7 +19,6 @@ class ThemeProvider with ChangeNotifier {
 
   _saveThemePreferences(themeMode) async {
 
-    print("saving theme mode: ${themeMode.toString()}");
     
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

@@ -25,7 +25,6 @@ void main() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String data = prefs.getString("savedTheme");
-    print(data);
 
     if (data != null) {
       if (data == "Light") {
@@ -33,7 +32,6 @@ void main() async {
       }
       if (data == "Dark") {
         initialTheme =  appThemes[1].mode;
-        print("inital theme dark");
       }
       if (data == "Auto") {
         initialTheme = appThemes[2].mode;
