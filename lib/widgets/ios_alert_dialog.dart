@@ -15,7 +15,7 @@ class IOSAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = Theme.of(context).primaryColor;
+    Color textColor = Theme.of(context).colorScheme.primary;
     Prefs prefs = Provider.of<Prefs>(context, listen: false);
     return CupertinoAlertDialog(
       title: Text(

@@ -38,11 +38,11 @@ class _SearchBoxState extends State<SearchBox> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide:
-                BorderSide(color: Theme.of(context).colorScheme.secondary),
+                BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           hintText: 'Enter Stop Name or Number',
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
           prefixIcon: const Icon(Icons.search),
         ),
       ),

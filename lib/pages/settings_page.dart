@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:irish_bus_refresh/widgets/theme_switcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:package_info/package_info.dart';
@@ -50,8 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(defaultTargetPlatform == TargetPlatform.iOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return Padding(
         padding: getPadding(),
         child: Column(
@@ -82,7 +82,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       MaterialPageRoute(
                           settings: const RouteSettings(name: "Privacy Policy"),
                           builder: (context) => const PrivacyPolicy()));
-                })
+                }),
+                const Divider(),
+            ListTile(title: const Text("Theme"), subtitle: ThemeSwitcher()),
+            const Divider()
           ],
         ),
       );
@@ -142,8 +145,8 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-    getPadding(){
-    if(defaultTargetPlatform == TargetPlatform.iOS){
+  getPadding() {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return const EdgeInsets.only(top: 32);
     }
 

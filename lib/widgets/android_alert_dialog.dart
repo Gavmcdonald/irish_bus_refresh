@@ -20,7 +20,7 @@ class AndroidAlertDialog extends StatelessWidget {
       title: Text(
         "Rename Stop",
         textAlign: TextAlign.center,
-        style: TextStyle(color: Theme.of(context).primaryColor),
+        style: TextStyle(color: Theme.of(context).colorScheme.primary),
       ),
       content: TextField(
         autofocus: true,
@@ -37,7 +37,7 @@ class AndroidAlertDialog extends StatelessWidget {
         ),
         TextButton(
           child: Text("Save",
-              style: TextStyle(color: Theme.of(context).primaryColor)),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           onPressed: () {
             controller.value.text == ""
                 ? stop.customName = ""
