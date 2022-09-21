@@ -70,11 +70,13 @@ class _ResultPageState extends State<ResultPage> {
 
   Widget _getAdWidget() {
     if (_anchoredAdaptiveAd != null && _isLoaded) {
-      return Container(
-        color: Theme.of(context).backgroundColor,
-        width: _anchoredAdaptiveAd.size.width.toDouble(),
-        height: _anchoredAdaptiveAd.size.height.toDouble(),
-        child: AdWidget(ad: _anchoredAdaptiveAd),
+      return SafeArea(
+        child: Container(
+          color: Theme.of(context).backgroundColor,
+          width: _anchoredAdaptiveAd.size.width.toDouble(),
+          height: _anchoredAdaptiveAd.size.height.toDouble(),
+          child: AdWidget(ad: _anchoredAdaptiveAd),
+        ),
       );
     }
     return Container();

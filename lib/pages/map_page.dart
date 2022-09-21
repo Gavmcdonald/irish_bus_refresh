@@ -9,6 +9,8 @@ import 'package:irish_bus_refresh/models/stop.dart';
 import 'package:irish_bus_refresh/pages/result_page.dart';
 import 'dart:async';
 
+import '../assets/map_theme.dart';
+
 class MapSample extends StatefulWidget {
   const MapSample({Key key}) : super(key: key);
   @override
@@ -30,6 +32,7 @@ class MapSampleState extends State<MapSample> {
     for (var data in parsed) {
       Stop stop = Stop.fromJson(data);
       allMarkers.add(Marker(
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         infoWindow: InfoWindow(
             title: stop.name.split(", ")[0],
             snippet: stop.stopNumber,
@@ -63,27 +66,35 @@ class MapSampleState extends State<MapSample> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return GoogleMap(
-        minMaxZoomPreference: const MinMaxZoomPreference(13.0, 18.0),
-        myLocationButtonEnabled: true,
-        markers: _filteredMarkers.toSet(),
-        onCameraMove: (position) {
-          cameraPosition = position.target;
-        },
-        onCameraIdle: () {
-          getNearbyStops(cameraPosition);
-        },
-        indoorViewEnabled: false,
-        myLocationEnabled: true,
-        zoomControlsEnabled: true,
-        mapToolbarEnabled: false,
-        compassEnabled: false,
-        mapType: MapType.normal,
-        initialCameraPosition: _ireland,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-          _goToTheLake();
-        },
+      return Container(
+        color: Theme.of(context).canvasColor,
+        child: GoogleMap(
+          minMaxZoomPreference: const MinMaxZoomPreference(13.0, 18.0),
+          myLocationButtonEnabled: true,
+          markers: _filteredMarkers.toSet(),
+          onCameraMove: (position) {
+            cameraPosition = position.target;
+          },
+          onCameraIdle: () {
+            getNearbyStops(cameraPosition);
+          },
+          indoorViewEnabled: false,
+          myLocationEnabled: true,
+          zoomControlsEnabled: true,
+          mapToolbarEnabled: false,
+          compassEnabled: false,
+          mapType: MapType.normal,
+          initialCameraPosition: _ireland,
+          onMapCreated: (GoogleMapController controller) {
+            if (Theme.of(context).brightness == Brightness.dark) {
+              controller.setMapStyle(mapThemeData);
+            } else {
+              controller.setMapStyle(lightMapThemeData);
+            }
+            _controller.complete(controller);
+            _goToTheLake();
+          },
+        ),
       );
     }
 
@@ -111,6 +122,11 @@ class MapSampleState extends State<MapSample> {
         mapType: MapType.normal,
         initialCameraPosition: _ireland,
         onMapCreated: (GoogleMapController controller) {
+          if (Theme.of(context).brightness == Brightness.dark) {
+            controller.setMapStyle(mapThemeData);
+          } else {
+            controller.setMapStyle(lightMapThemeData);
+          }
           _controller.complete(controller);
           //_goToTheLake(); //TODO: remove this, location should be gotten in init state
         },
@@ -133,9 +149,7 @@ class MapSampleState extends State<MapSample> {
     controller.getVisibleRegion();
   }
 
-  filterMarkers(LatLng cameraPosition) {
-   
-  }
+  filterMarkers(LatLng cameraPosition) {}
 
   getNearbyStops(LatLng cameraPosition) {
     double searchRadius = 2.0;

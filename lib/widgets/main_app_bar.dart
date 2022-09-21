@@ -13,10 +13,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return AppBar(
-        toolbarHeight: 0,
-        toolbarOpacity: 0,
-        backgroundColor: Theme.of(context).canvasColor,
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         elevation: 0,
+        backgroundColor: Theme.of(context).canvasColor,
       );
     }
 
@@ -44,8 +43,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
         PopupMenuButton<String>(
-          icon:
-              Icon(Icons.adaptive.more, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(Icons.adaptive.more,
+              color: Theme.of(context).colorScheme.primary),
           onSelected: optionSelection,
           itemBuilder: (BuildContext context) {
             List<String> options = ["Settings"];

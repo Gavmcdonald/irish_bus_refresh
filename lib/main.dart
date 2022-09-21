@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:irish_bus_refresh/providers/network_provider.dart';
@@ -22,30 +23,28 @@ void main() async {
 
   ThemeMode initialTheme;
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String data = prefs.getString("savedTheme");
+  String data = prefs.getString("savedTheme");
 
-    if (data != null) {
-      if (data == "Light") {
-       initialTheme = appThemes[0].mode;
-      }
-      if (data == "Dark") {
-        initialTheme =  appThemes[1].mode;
-      }
-      if (data == "Auto") {
-        initialTheme = appThemes[2].mode;
-      }
+  if (data != null) {
+    if (data == "Light") {
+      initialTheme = appThemes[0].mode;
     }
+    if (data == "Dark") {
+      initialTheme = appThemes[1].mode;
+    }
+    if (data == "Auto") {
+      initialTheme = appThemes[2].mode;
+    }
+  }
 
   if (defaultTargetPlatform == TargetPlatform.android) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
   }
   //Rprint(initialTheme.toString());
-  runApp(ChangeNotifierProvider.value(value: Prefs(), child: MyApp(initialTheme: initialTheme)));
-
-
-  
+  runApp(ChangeNotifierProvider.value(
+      value: Prefs(), child: MyApp(initialTheme: initialTheme)));
 }
 
 class MyApp extends StatelessWidget {
@@ -62,7 +61,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: ((context) => Network())),
-        ChangeNotifierProvider(create: ((context) => ThemeProvider(initialTheme))),
+        ChangeNotifierProvider(
+            create: ((context) => ThemeProvider(initialTheme))),
       ],
       child: Consumer<ThemeProvider>(
         child: const AppHomePage(),
@@ -73,14 +73,23 @@ class MyApp extends StatelessWidget {
             themeMode: themeProvider.selectedThemeMode,
             theme: ThemeData(
               brightness: Brightness.light,
-              primarySwatch: Colors.blue,
+              colorSchemeSeed: Colors.blue[200],
               //primaryColor: themeProvider.selectedPrimaryColor,
             ),
             darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              primarySwatch: Colors.lightBlue,
-              //primaryColor: themeProvider.selectedPrimaryColor,
-            ),
+                colorSchemeSeed: Colors.blueAccent,
+                brightness: Brightness.dark,
+                //canvasColor: Colors.white,
+                //cardColor: Colors.white,
+                appBarTheme: const AppBarTheme(
+                    elevation: 0,
+                    backgroundColor: null,
+                    systemOverlayStyle: SystemUiOverlayStyle(
+                        statusBarBrightness: Brightness.dark,
+                        statusBarColor: Colors.transparent,
+                        statusBarIconBrightness: Brightness.dark))
+                //primaryColor: themeProvider.selectedPrimaryColor,
+                ),
             home: child,
           );
         },

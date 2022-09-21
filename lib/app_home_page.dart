@@ -94,6 +94,8 @@ getNavBar(_selectedIndex, _onItemTapped, context) {
       : const Icon(Icons.star_border_outlined);
 
   return CupertinoTabBar(
+    height: 60,
+    backgroundColor: Theme.of(context).canvasColor,
     border: const Border(),
     iconSize: 28,
     items: [
