@@ -30,6 +30,9 @@ class StopList extends ChangeNotifier {
           .where(
               (stop) => stop.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
+      if(_filteredStopList.isEmpty){
+        _filteredStopList = _listOfAllStops;
+      }
       notifyListeners();
     }
   }

@@ -20,6 +20,7 @@ class _SearchBoxState extends State<SearchBox> {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: CupertinoSearchTextField(
+          style: const TextStyle(color: CupertinoColors.secondaryLabel),
           controller: searchBoxController,
           onChanged: (entered) => Provider.of<StopList>(context, listen: false)
               .filterStopList(entered),
