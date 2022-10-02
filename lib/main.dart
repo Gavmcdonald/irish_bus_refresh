@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
                     systemOverlayStyle: SystemUiOverlayStyle(
                         statusBarBrightness: Brightness.dark,
                         statusBarColor: Colors.transparent,
-                        statusBarIconBrightness: Brightness.dark))
+                        statusBarIconBrightness: Brightness.light)),
                 //primaryColor: themeProvider.selectedPrimaryColor,
                 ),
             home: child,

@@ -61,6 +61,7 @@ class _SettingsListState extends State<SettingsList> {
           onChanged: (boo) => prefs.toggleShowScheduledDepartures());
     } else {
       return Checkbox(
+        activeColor: Theme.of(context).colorScheme.primary,
           value: prefs.showScheduledDepartures,
           onChanged: (boo) {
             prefs.toggleShowScheduledDepartures();

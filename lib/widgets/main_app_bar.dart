@@ -27,10 +27,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
-      systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.light,
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark),
       elevation: 0,
       backgroundColor: Theme.of(context).canvasColor,
       actions: [
